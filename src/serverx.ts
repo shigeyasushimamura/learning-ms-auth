@@ -2,6 +2,10 @@ import express from "express";
 import winston from "winston";
 import expressWinston from "express-winston";
 import helmet from "helmet";
+import { AuthRouter } from "./interface/routes/authRoutes";
+import { AuthController } from "./interface/controllers/authController";
+import { AuthApplicationService } from "./application/services/authApplicationService";
+import { AuthRepository } from "./infrastructure/repositories/AuthRepository";
 
 const app = express();
 export const allowOrigin =
@@ -56,10 +60,14 @@ app.use(helmet());
 app.use(express.json());
 
 // リポジトリとサービスの初期化
+const authRepository = new AuthRepository();
+const authApplicationService = new AuthApplicationService(authRepository);
 
 // コントローラの初期化
+const authController = new AuthController(authApplicationService);
 
 // ルータの設定
+app.use("/auth", AuthRouter(authController));
 
 // エラーハンドラー
 
